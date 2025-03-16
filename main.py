@@ -63,9 +63,17 @@ def print_help():
     print("\nSupported operations: add, subtract, multiply, divide")
     print("Example: python main.py 10 5 divide")
 
-def print_menu():
+def print_menu(calc):
     """Display menu information"""
-    print("Available plugins are Add, Subtract, Multiply, Divide")
+    available_operations = calc.get_available_operations()
+
+    if not available_operations:
+        print("No plugins available")
+        return
+    
+    print("\nAvailable Operations:")
+    for operation_name, operation_type in available_operations.items():
+        print(f" - {operation_name.capitalize()}: {operation_type}")
 
 def main():
     """Main function for the calculator CLI"""
@@ -76,7 +84,7 @@ def main():
         if sys.argv[1] == "help":
             print_help()
         elif sys.argv[1] == "menu":
-            print_menu()
+            print_menu(calc)
         elif sys.argv[1] == "history":
             show_history(calc)
         else:
@@ -105,7 +113,7 @@ def main():
             elif command == "history":
                 show_history(calc)
             elif command == "menu":
-                print_menu()
+                print_menu(calc)
             else:
                 process_command(calc, args)
                 
