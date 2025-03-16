@@ -58,9 +58,14 @@ def print_help():
     print("  - Calculation in postfix notation: 4 3 add")
     print("  - history: Display calculation history")
     print("  - help: Display this help message")
+    print("  - menu: Display all available plugin commands")
     print("  - exit: Exit the program")
     print("\nSupported operations: add, subtract, multiply, divide")
     print("Example: python main.py 10 5 divide")
+
+def print_menu():
+    """Display menu information"""
+    print("Available plugins are Add, Subtract, Multiply, Divide")
 
 def main():
     """Main function for the calculator CLI"""
@@ -70,6 +75,8 @@ def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == "help":
             print_help()
+        elif sys.argv[1] == "menu":
+            print_menu()
         elif sys.argv[1] == "history":
             show_history(calc)
         else:
@@ -79,7 +86,7 @@ def main():
     # Interactive mode
     print("Advanced Calculator - Interactive Mode")
     print("Enter commands in postfix notation (e.g., '4 3 add')")
-    print("Type 'help' for more information or 'exit' to quit")
+    print("Type 'help' for more information, 'menu' to see available plugins, or 'exit' to quit")
     
     while True:
         try:
@@ -97,6 +104,8 @@ def main():
                 print_help()
             elif command == "history":
                 show_history(calc)
+            elif command == "menu":
+                print_menu()
             else:
                 process_command(calc, args)
                 
