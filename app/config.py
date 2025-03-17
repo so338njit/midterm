@@ -10,8 +10,10 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 # History configuration
 MAX_HISTORY_SIZE = int(os.getenv("MAX_HISTORY_SIZE", "5"))
-SAVE_HISTORY = os.getenv("SAVE_HISTORY", "True").lower() == "true"
-HISTORY_FILE = os.getenv("HISTORY_FILE", "calculator_history.json")
+
+# Data directory configuration
+DATA_DIRECTORY = os.getenv("DATA_DIRECTORY", "data")
+CSV_HISTORY_FILE = os.path.join(DATA_DIRECTORY, os.getenv("CSV_HISTORY_FILE", "calculator_history.csv"))
 
 # Display configuration
 DECIMAL_PRECISION = int(os.getenv("DECIMAL_PRECISION", "10"))
