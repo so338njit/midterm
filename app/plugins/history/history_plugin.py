@@ -36,13 +36,13 @@ class LoadHistoryCommand(HistoryCommand):
     def execute(self) -> pd.DataFrame:
         """Load calculation history from a CSV file."""
         file_path = self.kwargs.get('file_path', CSV_HISTORY_FILE)
-        
+
         self.logger.debug("Loading history from %s", file_path)
-        
+
         if not os.path.exists(file_path):
             self.logger.warning("History file %s not found", file_path)
             return pd.DataFrame(columns=['timestamp', 'operation', 'a', 'b', 'result'])
-        
+
         try:
             df = pd.read_csv(file_path)
             self.logger.debug("Loaded %d history records", len(df))
@@ -64,19 +64,32 @@ class SaveHistoryCommand(HistoryCommand):
         """Save calculation history to a CSV file."""
         file_path = self.kwargs.get('file_path', CSV_HISTORY_FILE)
         history_data = self.kwargs.get('history_data')
-        
-        if history_data is None or not isinstance(history_data, pd.DataFrame):
-            self.logger.error("Invalid history data provided")
-            raise ValueError("History data must be a pandas DataFrame")
-        
+
+        # Debug
+        self.logger.debug(f"SaveHistoryCommand.execute called with file_path={file_path}")
+        self.logger.debug(f"History data type: {type(history_data)}")
+
+        # Check if history_data is None
+        if history_data is None:
+            self.logger.error("History data is None")
+            raise ValueError("History data must not be None")
+
+        # Check if history_data is a DataFrame
+        if not isinstance(history_data, pd.DataFrame):
+            self.logger.error("Invalid history data type: %s", type(history_data))
+            raise ValueError(f"History data must be a pandas DataFrame, got {type(history_data)}")
+
         # Ensure the directory exists
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        
+        directory = os.path.dirname(file_path)
+        if directory:
+            os.makedirs(directory, exist_ok=True)
+
         self.logger.debug("Saving %d history records to %s", len(history_data), file_path)
-        
+
         try:
+            # Save the DataFrame to CSV
             history_data.to_csv(file_path, index=False)
-            self.logger.debug("History saved successfully")
+            self.logger.debug("History saved successfully to %s", file_path)
             return True
         except Exception as e:
             self.logger.error("Failed to save history: %s", str(e))
