@@ -153,12 +153,12 @@ def test_calculator_end_to_end():
         pass  # Power might not be loaded
 
     # Test history tracking
-    history = calc.get_history()
-    assert len(history) >= 2  # At least the operations we just performed
+    history_df = calc.get_history()
+    assert len(history_df) >= 2  # At least the operations we just performed
 
-    # Test history contains the right types of commands
-    operation_names = set(cmd.name for cmd in history)
-    assert "add" in operation_names
-    assert "subtract" in operation_names
-    assert "multiply" in operation_names
-    assert "divide" in operation_names
+    # Test history contains the right types of operations
+    operation_names = set(history_df['operation'])
+    assert 'add' in operation_names
+    assert 'subtract' in operation_names
+    assert 'multiply' in operation_names
+    assert 'divide' in operation_names
