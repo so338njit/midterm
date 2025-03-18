@@ -32,9 +32,9 @@ class Calculator:
         # Ensure the history file directory exists
         os.makedirs(os.path.dirname(self.history_file), exist_ok=True)
 
+        # Create empty CSV file if it doesn't exist
         if not os.path.exists(self.history_file):
             empty_df = pd.DataFrame(columns=['timestamp', 'operation', 'a', 'b', 'result'])
-            os.makedirs(os.path.dirname(self.history_file), exist_ok=True)
             empty_df.to_csv(self.history_file, index=False)
             self.logger.info(f"Created empty history file at {self.history_file}")
 
@@ -59,6 +59,15 @@ class Calculator:
 
     def _load_history(self) -> pd.DataFrame:
         """Load history data using the load_history plugin."""
+        # Direct file reading as a fallback
+        if os.path.exists(self.history_file):
+            try:
+                df = pd.read_csv(self.history_file)
+                return df
+            except Exception as e:
+                self.logger.error(f"Error directly loading history: {e}")
+
+        # Try using the plugin system
         load_plugin = self.plugin_manager.get_plugin('history', 'load_history')
         if not load_plugin:
             self.logger.warning("Load history plugin not found")
@@ -79,25 +88,41 @@ class Calculator:
             return pd.DataFrame(columns=['timestamp', 'operation', 'a', 'b', 'result'])
 
     def _save_history(self) -> None:
-        """Save history data using the save_history plugin."""
+        """Save history data using direct file writing and plugin system."""
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(self.history_file), exist_ok=True)
+    
+        # Make sure we have a proper DataFrame before doing anything
+        if not isinstance(self._history_data, pd.DataFrame):
+            self.logger.warning("History data is not a DataFrame, initializing empty DataFrame")
+            self._history_data = pd.DataFrame(columns=['timestamp', 'operation', 'a', 'b', 'result'])
+    
+        # Direct file writing as a reliable approach
+        try:
+            # Save directly to CSV
+            self._history_data.to_csv(self.history_file, index=False)
+            self.logger.debug(f"Directly saved history to {self.history_file}")
+        except Exception as e:
+            self.logger.error(f"Error directly saving history: {e}")
+    
+        # Plugin-based saving with updated approach
         save_plugin = self.plugin_manager.get_plugin('history', 'save_history')
         if not save_plugin:
             self.logger.warning("Save history plugin not found")
             return
-
-        # Make sure we have a proper DataFrame before saving
-        if not isinstance(self._history_data, pd.DataFrame):
-            self.logger.warning("History data is not a DataFrame, initializing empty DataFrame")
-            self._history_data = pd.DataFrame(columns=['timestamp', 'operation', 'a', 'b', 'result'])
-
+    
         command_class = save_plugin.get_command_class()
-        command = command_class(kwargs={'file_path': self.history_file, 'history_data': self._history_data})
-
+    
         try:
+            # IMPORTANT: Pass the kwargs as unpacked key-value pairs
+            command = command_class(
+                file_path=self.history_file,
+                history_data=self._history_data.copy()
+            )
             command.execute()
-            self.logger.debug("History saved to %s", self.history_file)
+            self.logger.debug("History saved via plugin to %s", self.history_file)
         except Exception as e:
-            self.logger.error("Failed to save history: %s", str(e))
+            self.logger.error(f"Failed to save history via plugin: {str(e)}")
 
     def _add_to_history(self, operation: str, a: Decimal, b: Decimal, result: Decimal) -> None:
         """Add an operation to the history."""
@@ -109,7 +134,17 @@ class Calculator:
             'result': float(result)
         }
 
-        self._history_data = pd.concat([self._history_data, pd.DataFrame([new_record])], ignore_index=True)
+        # Create a new DataFrame from the record
+        new_df = pd.DataFrame([new_record])
+        
+        if len(self._history_data) == 0:
+            # If history is empty, just use the new DataFrame
+            self._history_data = new_df
+        else:
+            # Otherwise concatenate with existing data
+            self._history_data = pd.concat([self._history_data, new_df], ignore_index=True)
+
+        # Save immediately after adding
         self._save_history()
 
     def _create_operation_methods(self):
@@ -248,9 +283,13 @@ class Calculator:
             return
 
         command_class = delete_plugin.get_command_class()
-        command = command_class(kwargs={'history_data': self._history_data, 'index': index})
 
         try:
+            # Pass parameters directly instead of in a kwargs dictionary
+            command = command_class(
+                history_data=self._history_data.copy(),
+                index=index
+            )
             self._history_data = command.execute()
             self._save_history()
             self.logger.debug("Record at index %d deleted", index)
