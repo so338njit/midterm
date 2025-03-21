@@ -1,17 +1,18 @@
 """Unit tests for the Calculator class."""
+#pylint: disable= unused-import, no-member, protected-access
 import unittest
 import os
 import shutil
 import tempfile
-import pandas as pd
 import logging
 from unittest.mock import patch, MagicMock, mock_open
 from decimal import Decimal
+import pandas as pd
 from app.calculator import Calculator
 from app.plugins import get_plugin_manager
 
 
-class TestCalculator(unittest.TestCase):
+class TestCalculator(unittest.TestCase): #pylint: disable= too-many-public-methods
     """Tests for Calculator class."""
 
     def setUp(self):
@@ -177,7 +178,7 @@ class TestCalculator(unittest.TestCase):
         try:
             self.calculator.reload_plugins()
             succeeded = True
-        except Exception:
+        except Exception: #pylint: disable= broad-exception-caught
             succeeded = False
 
         self.assertTrue(succeeded)
@@ -256,7 +257,7 @@ class TestCalculator(unittest.TestCase):
         test_file = os.path.join(self.test_data_dir, "error_test.csv")
 
         # Create an empty file to read
-        with open(test_file, 'w') as f:
+        with open(test_file, 'w', encoding='utf-8') as f:
             f.write("timestamp,operation,a,b,result\n")
 
         # Create calculator to trigger loading
@@ -276,7 +277,7 @@ class TestCalculator(unittest.TestCase):
             self.calculator.add(Decimal('5'), Decimal('3'))
             # No exception should propagate
             succeeded = True
-        except Exception:
+        except Exception: #pylint: disable= broad-exception-caught
             succeeded = False
 
         self.assertTrue(succeeded)

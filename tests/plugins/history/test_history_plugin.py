@@ -1,9 +1,11 @@
 """Unit tests for the History Plugin."""
+# pylint: disable= unused-import, trailing-whitespace
 import unittest
 import os
 import tempfile
-import pandas as pd
 from decimal import Decimal
+import pandas as pd
+
 
 from app.plugins.history.history_plugin import (
     LoadHistoryCommand,
@@ -65,7 +67,7 @@ class TestHistoryPlugin(unittest.TestCase):
 
         # Check the content matches
         pd.testing.assert_frame_equal(
-            saved_data.reset_index(drop=True), 
+            saved_data.reset_index(drop=True),
             self.sample_data.reset_index(drop=True),
             check_dtype=False  # CSV reading might change datatypes slightly
         )
@@ -86,7 +88,7 @@ class TestHistoryPlugin(unittest.TestCase):
         # Verify the loaded data matches the original
         self.assertEqual(loaded_data.shape, self.sample_data.shape)
         pd.testing.assert_frame_equal(
-            loaded_data.reset_index(drop=True), 
+            loaded_data.reset_index(drop=True),
             self.sample_data.reset_index(drop=True),
             check_dtype=False  # CSV reading might change datatypes slightly
         )
