@@ -10,7 +10,7 @@ II. Dependencies
     
 III. Config
     The program uses a dotenv file to store dependencies that are ignored from git. To use this program install dotenv and setup the proper configuration. Also, the csv file path uses the configuration files to define the path and file name.
-[link to specific code showing the program calling on enviromental variables from dotenv file] (https://github.com/so338njit/midterm/blob/master/app/calculator.py#L60-L65)
+[link to specific code showing the program calling on enviromental variables from dotenv file](https://github.com/so338njit/midterm/blob/master/app/calculator.py#L60-L65)
 
 The program has a robust logging implementation designed throughout the program with file path created through the config.py and logging_setup.py files. The logs are categorized through the 5 basic levels or logging and saved to a calculator.log file in the logs directory.  
 
