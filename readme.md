@@ -2,6 +2,8 @@
 This program uses REPL methods and integration throughout the code to execute the simple functions of a calculator. The command handler and plugin architecure can be seen through looking at the directory structure in the repo. The calculator uses a command handler to load the operation and history plugins.
 This program follows the 12-Factor app taught in the IS601 course.
 
+[Program features video](https://youtu.be/b8zHJSFialE)
+
 I. Codebase
     This entire program was built using git for version control. The initial codebase was built using a command handler and plugins for integration. A logging branch, pandas branch, and testing branch were created to add further features to the program and merged once complete.
 
